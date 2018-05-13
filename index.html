@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Casino Craps</title>
+	<meta charset="utf-8">
+	<!--
+	File name: index.html
+	Author: Semaj Primm
+	Date created: 20-02-18
+	Date modified: 07-03-18
+	Version: 2.0
+	Description:
+		Interative program that allows users to play the casino game of Craps.
+		Written in HTML, CSS, and Javascript.
+		At the beginning of the game, the player rolls a pair of dice and computes the total.
+  	If the total is 2, 3, or 12 (called "craps"), the player loses.
+  	If the total is 7 or 11 (called a "natural"), the player wins.
+  	If the total is any other number, that number becomes the "point".
+  	From here, the player keeps rolling the dice until
+  				(a) the point comes up again, in which case the player wins, or
+  				(b) a 7 appears, in which case the player loses.
+  	The numbers 2,3,11, and 12 no longer have special significance after the first rolls.
+	-->
+	<style>
+	*{
+		font-family: 'Playfair Display', serif;
+		background: #f8f8f8;
+	}
+
+	h1, footer{
+		text-align: center;
+	}
+
+	table{
+		position: relative;
+		margin: auto;
+	}
+
+	table td{
+		border: 1px solid green;
+		width: 50%;
+		height: 70px;
+		text-align: center;
+	}
+
+	button{
+		color:#fff;
+		font-size: 16px;
+		padding: 10px 35px;
+		margin: 5px;
+		border:none;
+		background-color: #4abaee;
+		border-radius: 4px;
+	}
+
+	button:hover{
+		background-color: #359ccb;
+	}
+
+	button:active{
+		background-color: #2888b4;
+		color: #e2e2e2;
+	}
+
+	#wins{
+		color: #69e056;
+	}
+
+	#losses{
+		color: #f32f2f;
+	}
+
+	#wins, #losses, #total, #alpha, #bravo{
+		font-weight: bold;
+		font-size: 20px;
+	}
+
+	#show{
+		font-size: 12px;
+	}
+	</style>
+</head>
+<body>
+	<!--Game Title-->
+	<h1>Casino Craps</h1>
+	<!--Game content-->
+	<table>
+		<tr>
+			<!--Display of dice values-->
+			<td>
+				<div id="alpha" class="die"></div>
+				<div id="bravo" class="die"></div>
+		  </td>
+			<!--Display of dice sum-->
+			<td class="total">
+				<small>You rolled&hellip;</small><br><var id="total"></var>
+			</td>
+		</tr>
+		<tr>
+			<!--Display Game Statistics-->
+			<td>
+				<p>Wins: <span id="wins">0</span> Losses: <span id="losses">0</span></p>
+			</td>
+			<!--Game instructions and message-->
+			<td>
+				<div id="show" class="show">To start a game, roll the dice!<br></div>
+			</td>
+		</tr>
+		<tr>
+			<!--Button resetting the game and clearing the dice values, statistics, dice total, and resetting the message -->
+			<td>
+				<button id="clear">Clear</button>
+			</td>
+			<!--Button for rolling the dice and starting the game-->
+			<td>
+				<button id="roll" class="roll">Roll the dice!</button>
+			</td>
+		</tr>
+	</table>
+	<!--Program author credits-->
+	<footer>
+		<address>2018 &copy; SYST10199 Web Programming, Sheridan College by Semaj Primm</address>
+	</footer>
+
+<!--Programming logic for game-->
+<script>
+
+// outcome is a handle to id=total
+var outcome = document.getElementById('total');
+// show is a handle to id=show
+var show = document.getElementById('show');
+// showWins is a handle to id=wins
+var showWins = document.getElementById('wins');
+// showLosses is a handle to id=losses
+var showLosses = document.getElementById('losses');
+// point is an integer that stores the point value, or 0 if there is no point
+var point = 0;
+// wins keeps track of winning statistics
+var wins = 0;
+// losses keeps track of losses statistics
+var losses = 0;
+// message is an object that holds text for natural, craps, point, and seven
+var message = {
+		natural:"That's a natural. You win!",
+		craps:"That's craps. You lose.",
+		point:"You made your point. You win!",
+		seven:"That's a 7. You lose."
+};
+
+// onclick event for button with id=roll that will run the rollBoth() function
+document.getElementById('roll').onclick = rollBoth;
+// onclick event for button with id=clear that will run the clear() function
+document.getElementById('clear').onclick = clear;
+
+// roll(dice) function that will calculate a random number,
+// display on the dice and return the random number
+function roll(dice){
+	var random = Math.floor((Math.random() * 6) + 1);
+	document.getElementById(dice).innerHTML = random;
+	return random;
+}
+
+// clear() clears point, wins, losses, show, showWins, and showLosses
+function clear() {
+	point = 0;
+	wins = 0;
+	losses = 0;
+	show.innerHTML = "To start a game, roll the dice!";
+	showWins.innerHTML = "0";
+	showLosses.innerHTML = "0";
+	document.getElementById("alpha").innerHTML = "";
+	document.getElementById("bravo").innerHTML = "";
+	outcome.innerHTML = "";
+}
+
+// creates dice1 and dice2, calculates total
+// displays total in outcome and calls the determineOutcome(total)
+function rollBoth() {
+	var dice1 = roll("alpha");
+	var dice2 = roll("bravo");
+	var total = dice1 + dice2;
+	outcome.innerHTML = total;
+	determineOutcome(total);
+}
+
+// compares total to the rules and determines outcome (state of the game)
+function determineOutcome(total) {
+	if(point == 0){
+		if(total == 7 || total == 11){
+			// If the total is 7 or 11 (called a "natural"), the player wins.
+			wins++;
+			display("natural", showWins, wins);
+		}
+		else if(total == 2 || total == 3 || total == 12){
+			// If the total is 2, 3, or 12 (called "craps"), the player loses.
+			losses++;
+			display("craps", showLosses, losses);
+		}
+		else{
+			// Set point variable equal to total variable's value
+			point = total;
+			//If the total is any other number, that number becomes the "point".
+			show.innerHTML = "Your point is " + point;
+		}
+	}
+	else{
+		// If total is equal to point, user is a winner
+		if(total == point){
+			// Print out winner message
+			wins++;
+			display("point", showWins, wins);
+			point = 0;
+		}
+
+		// If total is equal to 7, user is a loser
+		if(total == 7){
+			// Print out loser message
+			losses++;
+			display("seven", showLosses, losses);
+			point = 0;
+		}
+	}
+
+}
+
+// msg is the key in the message object
+// c is showWins or showLosses
+// w is wins or losses
+// Displays the result message to player
+function display(msg, c, w) {
+	show.innerHTML = message[msg];
+	c.innerHTML = w;
+}
+
+</script>
+</body>
+</html>
